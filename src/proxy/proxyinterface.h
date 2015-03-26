@@ -1,7 +1,9 @@
 #ifndef __PROXY_INTERFACE_H__
 #define __PROXY_INTERFACE_H__
 
-typedef uint32_t PROXY_HANDLE;
+#include <sys/select.h>
+
+typedef void* PROXY_HANDLE;
 
 typedef enum {
   PROXY_CONTENT_TYPE_NONE        = 0,
@@ -66,7 +68,7 @@ proxy_interface_fdset (PROXY_HANDLE handle,fd_set * read_fd_set,
  * are actually available right now.On error,  -1 is returned.
  */
 int32_t 
-proxy_interface_read (PROXY_HANDLE handle, char * buf, int32_t len);
+proxy_interface_read (PROXY_HANDLE handle, char * buf, uint32_t len);
 
 /**
  * proxy_interface_write

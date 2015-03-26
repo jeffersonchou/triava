@@ -2,6 +2,7 @@
 #define __PROXY_CURL_WRAPPER_H__
 
 #include <stdint.h>
+#include <sys/select.h>
 
 typedef struct _CurlMultiTaskInfo CurlMultiTaskInfo;
 typedef struct _CurlRange CurlRange;
@@ -11,8 +12,8 @@ typedef struct _CurlRange CurlRange;
 #define CURL_SUCC          0
 #define CURL_FAIL          -1
 
-typedef uint32_t MULTI_HANDLE;
-typedef uint32_t SINGLE_HANDLE;
+typedef void* MULTI_HANDLE;
+typedef void* SINGLE_HANDLE;
 typedef struct _CurlTaskHandle REGULAR_HANDLE;
 
 typedef uint32_t (*CurlTaskWrite) (void *content, uint32_t size, uint32_t nmemb, void *user_data);

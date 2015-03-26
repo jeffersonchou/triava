@@ -1,5 +1,5 @@
-#include <curl/curl.h>
 #include <string.h>
+#include "curl.h"
 #include "proxycurlwrapper.h"
 #include "proxylog.h"
 
@@ -188,7 +188,7 @@ proxy_curl_multi_task_create ()
 void
 proxy_curl_multi_task_destroy (MULTI_HANDLE handle)
 {
-  p_return_if_fail (handle != 0);
+  p_return_if_fail (handle != NULL);
   
   curl_multi_cleanup((CURL *)handle);
 }
@@ -206,7 +206,7 @@ int32_t
 proxy_curl_multi_perform_sync (MULTI_HANDLE handle)
 {
   int32_t running_handles;
-  p_return_val_if_fail (handle != 0, CURL_FAIL);
+  p_return_val_if_fail (handle != NULL, CURL_FAIL);
 
   curl_multi_perform ((CURLM *)handle, &running_handles);
 
@@ -286,7 +286,7 @@ proxy_curl_multi_perform_sync (MULTI_HANDLE handle)
 int32_t
 proxy_curl_multi_perform_async (MULTI_HANDLE handle, int32_t * running_handles)
 {
-  p_return_val_if_fail (handle != 0, CURL_FAIL);
+  p_return_val_if_fail (handle != NULL, CURL_FAIL);
 
   if ( curl_multi_perform ((CURLM *)handle, running_handles) != CURLM_OK)
     return CURL_FAIL;
@@ -306,8 +306,8 @@ proxy_curl_multi_perform_async (MULTI_HANDLE handle, int32_t * running_handles)
 int32_t
 proxy_curl_multi_add_single (MULTI_HANDLE multi_handle, SINGLE_HANDLE single_handle)
 {
-  p_return_val_if_fail (multi_handle != 0, CURL_FAIL);
-  p_return_val_if_fail (single_handle != 0, CURL_FAIL);
+  p_return_val_if_fail (multi_handle != NULL, CURL_FAIL);
+  p_return_val_if_fail (single_handle != NULL, CURL_FAIL);
   
   if (CURLM_OK != curl_multi_add_handle ((CURLM *)multi_handle, \
     (CURL *)single_handle)) {
@@ -330,8 +330,8 @@ proxy_curl_multi_add_single (MULTI_HANDLE multi_handle, SINGLE_HANDLE single_han
 int32_t
 proxy_curl_multi_remove_single (MULTI_HANDLE multi_handle, SINGLE_HANDLE single_handle)
 {
-  p_return_val_if_fail (multi_handle != 0, CURL_FAIL);
-  p_return_val_if_fail (single_handle != 0, CURL_FAIL);
+  p_return_val_if_fail (multi_handle != NULL, CURL_FAIL);
+  p_return_val_if_fail (single_handle != NULL, CURL_FAIL);
   
   if (CURLM_OK != curl_multi_remove_handle ((CURLM *)multi_handle, \
     (CURL *)single_handle)) {
@@ -355,7 +355,7 @@ int32_t
 proxy_curl_multi_fdset (MULTI_HANDLE multi_handle,fd_set * read_fd_set,
     fd_set * write_fd_set,fd_set * exc_fd_set,int * max_fd)
 {
-  p_return_val_if_fail (multi_handle != 0, CURL_FAIL);
+  p_return_val_if_fail (multi_handle != NULL, CURL_FAIL);
   
   if (CURLM_OK != curl_multi_fdset((CURLM *)multi_handle, read_fd_set, \
     write_fd_set, exc_fd_set, max_fd)) {
@@ -376,7 +376,7 @@ proxy_curl_multi_fdset (MULTI_HANDLE multi_handle,fd_set * read_fd_set,
 void
 proxy_curl_single_set_url (SINGLE_HANDLE handle, char * url)
 {
-  p_return_if_fail (handle != 0);
+  p_return_if_fail (handle != NULL);
   p_return_if_fail (url != NULL);
     
   curl_easy_setopt ((CURL *)handle, CURLOPT_URL, url);
@@ -392,7 +392,7 @@ proxy_curl_single_set_url (SINGLE_HANDLE handle, char * url)
 void
 proxy_curl_single_set_range (SINGLE_HANDLE handle, char * range)
 {
-  p_return_if_fail (handle != 0);
+  p_return_if_fail (handle != NULL);
   p_return_if_fail (range != NULL);
     
   curl_easy_setopt ((CURL *)handle, CURLOPT_RANGE, range);
@@ -409,7 +409,7 @@ proxy_curl_single_set_range (SINGLE_HANDLE handle, char * range)
 void
 proxy_curl_single_opt_header (SINGLE_HANDLE handle, CurlTaskWrite func, void * data)
 {
-  p_return_if_fail (handle != 0);
+  p_return_if_fail (handle != NULL);
 
   curl_easy_setopt ((CURL *)handle, CURLOPT_HEADERFUNCTION, func);
   curl_easy_setopt ((CURL *)handle, CURLOPT_HEADERDATA, data);
@@ -426,7 +426,7 @@ proxy_curl_single_opt_header (SINGLE_HANDLE handle, CurlTaskWrite func, void * d
 void
 proxy_curl_single_opt_body (SINGLE_HANDLE handle, CurlTaskWrite func, void * data)
 {
-  p_return_if_fail (handle != 0);
+  p_return_if_fail (handle != NULL);
     
   curl_easy_setopt ((CURL *)handle, CURLOPT_WRITEFUNCTION, func);
   curl_easy_setopt ((CURL *)handle, CURLOPT_WRITEDATA, data);

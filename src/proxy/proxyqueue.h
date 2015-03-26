@@ -2,6 +2,7 @@
 #define __PROXY_QUEUE_H__
 
 #include <stdint.h>
+#include <pthread.h>
 #include "proxylist.h"
 
 #ifndef BOOL

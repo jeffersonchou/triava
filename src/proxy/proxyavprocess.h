@@ -1,11 +1,13 @@
 #ifndef __PROXY_AV_PROCESS_H__
 #define __PROXY_AV_PROCESS_H__
 
+#include <sys/select.h>
+
 #define MAX_SINGLE_COUNT 6 /* max single task count */
 
 #define DEFAULT_AV_BUFFER_SIZE (1*1024*1024)
 
-typedef uint32_t PROCESSOR_HANDLE;
+typedef void* PROCESSOR_HANDLE;
 
 typedef uint32_t (*AVProcessWrite) (void *content, uint32_t size, uint32_t nmemb, void *user_data);
 
@@ -20,7 +22,7 @@ typedef struct _ProxyAVProcessor ProxyAVProcessor;
  * Use as a callback param to the single task's data-write-function.
  */
 struct _ProxyAVSingleBuffer {
-  uint32_t single_handle;
+  void * single_handle;
   
   char *  buffer;           /* buffer to store cached data*/
   uint32_t  buffer_len;       /* currently allocated buffers length */
@@ -29,7 +31,7 @@ struct _ProxyAVSingleBuffer {
 
 struct _ProxyAVTaskHandle {
   /* multi task handle */
-  uint32_t multi;
+  void * multi;
 
   /* the buffer item now using for storing head */
   ProxyAVBufferItem * head_buf;
@@ -55,7 +57,7 @@ struct _ProxyAVProcessor {
   char * url;
 
   /* content length */
-  unsigned long long content_length;
+  uint32_t content_length;
 
   /* target data position to download */
   uint32_t start;
@@ -148,6 +150,6 @@ proxy_avprocess_fdset (PROCESSOR_HANDLE handle,fd_set * read_fd_set,
  * smaller than the number of bytes requested.On error,-1 is returned.
  */
 int32_t
-proxy_avprocess_read (PROCESSOR_HANDLE handle, char * buf, int32_t len);
+proxy_avprocess_read (PROCESSOR_HANDLE handle, char * buf, uint32_t len);
 
 #endif

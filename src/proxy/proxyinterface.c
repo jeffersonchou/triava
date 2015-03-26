@@ -20,7 +20,7 @@ struct _ProxyInterface {
 
   union {
     jb_socket fd;
-    uint32_t curl;
+    void * curl;
   }handle;
 };
 
@@ -67,7 +67,7 @@ proxy_interface_create (char * url)
   /* Connect server by different way according to the content type */
   if (content_type == PROXY_CONTENT_TYPE_MEDIA) {
     proxy->handle.curl = proxy_avprocess_create (url, NULL, NULL);
-    if (proxy->handle.curl == 0) {
+    if (proxy->handle.curl == NULL) {
       pri_error("create avprocess failed\n");
       goto creating_failed;
     }
@@ -188,7 +188,7 @@ proxy_interface_fdset (PROXY_HANDLE handle,fd_set * read_fd_set,
  * are actually available right now.On error,  -1 is returned.
  */
 int32_t 
-proxy_interface_read (PROXY_HANDLE handle, char * buf, int32_t len)
+proxy_interface_read (PROXY_HANDLE handle, char * buf, uint32_t len)
 {
   ProxyInterface * proxy = (ProxyInterface *)handle;
   

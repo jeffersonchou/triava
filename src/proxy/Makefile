@@ -1,14 +1,13 @@
-GCC = gcc
+CC=arm-linux-androideabi-gcc
 
-INCLUDE += -I./ -I../
+INCLUDE += -I./ -I../ -I../../include/
 
-CFLAGS += -DSVN_VER -DCOMPILE_DATE -Wall
+#CFLAGS += -DSVN_VER -DCOMPILE_DATE -Wall
+CFLAGS += -pipe -g  -ggdb -Wshadow  -Wconversion   -pthread -Wall
 
 LDFLAGS += -L./ \
-					-L/usr/local/lib \
 					-lcurl \
 					-lm \
-					-lncurses \
 
 SRC = proxylist.c proxyqueue.c proxycurlwrapper.c proxyavprocess.c proxyfiledownload.c proxyinterface.c
 
@@ -19,7 +18,7 @@ TARGET = libproxy.so
 all:$(TARGET)
 
 $(TARGET):
-	$(GCC) -shared -fPIC -g -o $(TARGET) $(SRC) $(INCLUDE) $(CFLAGS) $(LIBS) $(LDFLAGS)
+	$(CC) -shared -fPIC -g -o $(TARGET) $(SRC) $(INCLUDE) $(CFLAGS) $(LIBS) $(LDFLAGS)
 
 clean:
 	rm -rf $(TARGET)

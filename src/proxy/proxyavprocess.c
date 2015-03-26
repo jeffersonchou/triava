@@ -2,12 +2,13 @@
 #include <string.h>
 #include <stdlib.h>
 #include <ctype.h>
+#include <pthread.h>
 #include "proxyqueue.h"
 #include "proxycurlwrapper.h"
 #include "proxyavprocess.h"
 #include "proxylog.h"
 
-static BOOL avprocess_multi_task_build (ProxyAVProcessor *processor, int32_t count, BOOL need_head);
+static BOOL avprocess_multi_task_build (ProxyAVProcessor *processor, uint32_t count, BOOL need_head);
 static ProxyAVBufferItem * avprocess_buffer_item_obtain (ProxyQueue * queue);
 
 static uint32_t
@@ -73,7 +74,7 @@ avprocess_header_write (void * content, uint32_t size, uint32_t nmemb, void * us
 
     p += 15;
 
-    sscanf(p , "%llu", &processor->content_length);
+    sscanf(p , "%u", &processor->content_length);
   }  
 
   item = processor->handle.head_buf;
@@ -222,7 +223,7 @@ avprocess_buffer_item_obtain (ProxyQueue * queue)
  * Returns: TRUE on success and FALSE on error.
  */
 static BOOL
-avprocess_multi_task_build (ProxyAVProcessor *processor, int32_t count, BOOL need_head)
+avprocess_multi_task_build (ProxyAVProcessor *processor, uint32_t count, BOOL need_head)
 {
   uint32_t piece_start;
   uint32_t piece_end;
@@ -231,7 +232,7 @@ avprocess_multi_task_build (ProxyAVProcessor *processor, int32_t count, BOOL nee
   uint32_t download_length = 0;
   ProxyAVSingleBuffer *single_buf;
   char piece_range[256];
-  uint32_t single_handle;
+  SINGLE_HANDLE single_handle;
   ProxyAVBufferItem * item;
   int32_t i;
 
@@ -281,7 +282,7 @@ avprocess_multi_task_build (ProxyAVProcessor *processor, int32_t count, BOOL nee
   
   for (i = 0; i < count; i++) {
     single_buf = &processor->handle.singles[i];
-    if ((single_handle = proxy_curl_single_task_create()) == 0) {
+    if ((single_handle = proxy_curl_single_task_create()) == NULL) {
       pri_error ("Creating single task failed\n");
       goto task_bulid_failed;
     }
@@ -347,7 +348,7 @@ task_bulid_failed:
 static void
 avprocess_multi_task_free (ProxyAVProcessor *processor)
 {
-  uint32_t task_handle;
+  void * task_handle;
   int32_t i;
   ProxyAVSingleBuffer *single;
 
@@ -362,7 +363,7 @@ avprocess_multi_task_free (ProxyAVProcessor *processor)
 
   for (i = 0; i < MAX_SINGLE_COUNT; i++) {
     single = &processor->handle.singles[i];
-    single->single_handle = 0;
+    single->single_handle = NULL;
     single->buffer = NULL;
     single->buffer_len = 0;
     single->buffer_pos = 0;
@@ -401,7 +402,7 @@ PROCESSOR_HANDLE
 proxy_avprocess_create (char * url, AVProcessWrite func, void * user_data)
 {
   ProxyAVProcessor *processor;
-  uint32_t multi_handle;
+  MULTI_HANDLE multi_handle;
   
   p_return_val_if_fail (url != NULL, 0);
 
@@ -416,7 +417,7 @@ proxy_avprocess_create (char * url, AVProcessWrite func, void * user_data)
   processor->func = func;
   processor->user_data = user_data;
 
-  if ((multi_handle = proxy_curl_multi_task_create()) == 0) {
+  if ((multi_handle = proxy_curl_multi_task_create()) == NULL) {
     pri_error ("Creating multi task failed\n");
     return FALSE;
   }
@@ -582,7 +583,7 @@ proxy_avprocess_fdset (PROCESSOR_HANDLE handle,fd_set * read_fd_set,
  * smaller than the number of bytes requested.On error,-1 is returned.
  */
 int32_t
-proxy_avprocess_read (PROCESSOR_HANDLE handle, char * buf, int32_t len)
+proxy_avprocess_read (PROCESSOR_HANDLE handle, char * buf, uint32_t len)
 {
   ProxyAVProcessor * processor = (ProxyAVProcessor *)handle;
   ProxyAVBufferItem * item;
@@ -623,6 +624,6 @@ Exhausted:
     processor->data = NULL;
   }
 
-  return read_length;
+  return (int32_t)read_length;
 }
 
