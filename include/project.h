@@ -977,6 +977,9 @@ struct client_state
     * or NULL. Currently only used for socks errors.
     */
    char *error_message;
+
+   /* Processor Handle */
+   void * handle;
 };
 
 /**

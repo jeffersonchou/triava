@@ -2,9 +2,9 @@ CC=${CROSS_TOOLS}gcc
 AR=${CROSS_TOOLS}ar
 STRIP=${CROSS_TOOLS}strip
 
-CFLAGS = -I../include
+CFLAGS = -I../include -I./proxy
 CFLAGS += -pipe -g  -ggdb -Wshadow  -Wconversion   -pthread -Wall
-LIBS = -lz -pthread -lc -lnetfilter -lssl -lcrypto
+LIBS = -lz -pthread -lc -lnetfilter -lssl -lcrypto -L./proxy -lproxy
 
 OBJS = actions.o \
 	cgi.o \
